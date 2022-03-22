@@ -4,52 +4,81 @@ import {
   Switch,
   Route,
   Link,
-  useParams
+  useParams,
+  useRouteMatch
 } from "react-router-dom";
 
-// Params are placeholders in the URL that begin
-// with a colon, like the `:id` param defined in
-// the route in this example. A similar convention
-// is used for matching dynamic segments in other
-// popular web frameworks like Rails and Express.
-
-export default function ParamsExample() {
+export default function NestingExample() {
   return (
     <Router>
-      <div>
-        <h2>Accounts</h2>
-
+      <div>      
         <ul>
           <li>
-            <Link to="/netflix">Netflix</Link>
+            <Link to="/">Home</Link>
           </li>
           <li>
-            <Link to="/zillow-group">Zillow Group</Link>
-          </li>
-          <li>
-            <Link to="/yahoo">Yahoo</Link>
-          </li>
-          <li>
-            <Link to="/modus-create">Modus Create</Link>
-          </li>
+            <Link to="/topics">Topics</Link>
+          </li>          
         </ul>
+        
+        <hr></hr>
 
         <Switch>
-          <Route path="/:id" children={<Child />} />
+          <Route exact path="/">
+            <Home />
+          </Route>
+          <Route path="/topics">
+            <Topics />
+          </Route>
         </Switch>
       </div>
     </Router>
   );
 }
 
-function Child() {
-  // We can use the `useParams` hook here to access
-  // the dynamic pieces of the URL.
-  let { id } = useParams();
-
-  return (
+function Home() {
+  return(
     <div>
-      <h3>ID: {id}</h3>
+      <h2>Home</h2>
+    </div>
+  );
+}
+
+function Topics(){
+  let { path, url } = useRouteMatch();
+  return(
+    <div>     
+      <h2>Topics</h2> 
+        <ul>
+          <li>
+          <Link to={`${url}/Sate, Nasi Goreng`}>Kuliner</Link>
+          </li>
+          <li>
+          <Link to={`${url}/Wisata Alam, Museum`}>Travelling</Link>
+          </li>          
+          <li>
+            <Link to={`${url}/Ibis, JW Marriot`}>Review Hotel</Link>
+          </li>          
+        </ul>
+  
+        <Switch>
+          <Route exact path={path}>
+            <h3>Please Select a topic</h3>
+          </Route>
+          <Route path={`${path}/:topicId`}>
+            <Topic />
+          </Route>
+        </Switch>
+      </div>
+  );
+}
+
+function Topic() {
+  let { topicId } = useParams();
+
+  return(
+    <div>
+      <h3>{topicId}</h3>
     </div>
   );
 }
