@@ -1,121 +1,62 @@
-import React from "react";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  Redirect,
-  useHistory,
-  useLocation
-} from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.min.js';
+import { getToken, removeUserSession, setUserSession } from './Utils/Common';
+import Login from './Login';
+import Home from './Page/Home';
+import PrivateRoute from './Utils/PrivateRoute';
+import PublicRoute from './Utils/PublicRoute';
+import Header from './Component/Header';
+import Footer from './Component/Footer';
+import Account from './Page/Account';
+import Checkout from './Page/Checkout';
+import ShopGrid from './Page/ShopGrid'; 
+import Products from './Page/Products';
+import Cart from './Page/Cart';
+import Contact from './Page/Contact';
+import Service from './Page/Service';
 
-export default function AuthExample() {
-  return (
-    <Router>
-      <div>      
-        <AuthButton />
+function App() {
+  const [authLoading, setAuthLoading] = useState(true);
 
-        <ul>
-          <li>
-            <Link to="/public">Public Page</Link>
-          </li>
-          <li>
-            <Link to="/private">Private Page</Link>
-          </li>          
-        </ul>
+  useEffect(() => {
+    const token = getToken();
+    if (!token) {
+      return;
+    }
 
-        <Switch>
-          <Route path="/public">
-            <PublicPage/>
-          </Route>
-          <Route path="/login">
-            <LoginPage/>
-          </Route>
-          <PrivateRoute path="/private">
-            <ProtectedPage />
-          </PrivateRoute>
-        </Switch>
-      </div>
-    </Router>
-  );
-}
-
-const fakeAuth ={
-  isAuthenticated: false,
-  authenticate(cb){
-    fakeAuth.isAuthenticated = true;
-    setTimeout(cb, 100);
-  },
-  signout(cb){
-    fakeAuth.isAuthenticated = false;
-    setTimeout(cb, 100);
-  }
-};
-function AuthButton() {
-  let history = useHistory();
-
-  return fakeAuth.isAuthenticated ? (
-    <p>
-      Welcome!{" "}
-      <button
-        onClick={() => {
-          fakeAuth.signout(() => history.push("/"));
-        }}
-      >
-        Sign Out
-      </button>
-      </p>
-  ) : (
-    <p>You Are Not Logged in</p>
-  );
-}
-
-function PrivateRoute({children, ...rest}){
-  return(
-    <Route
-      {...rest}
-      render = {({ location }) =>
-      fakeAuth.isAuthenticated ? (
-        children
-      ) : (
-        <Redirect
-          to={{
-            pathname: "/login",
-            state: { from: location}
-          }}
-        />
-        )
-      }
-    />
-  );
-}
-
-function PublicPage() {
-  return(
-      <h3>Public</h3>    
-  );
-}
-
-function ProtectedPage() {
-  return(
-      <h3>Private</h3>    
-  );
-}
-
-function LoginPage() {
-  let history = useHistory();
-  let location = useLocation();
-  let { from } = location.state || {from: {pathname: "/ " }} ;
-  let login = () => {
-    fakeAuth.authenticate(()=>{
-      history.replace(from);
+    axios.get(`http://localhost:4000/verifyToken?token=${token}`).then(response => {
+      setUserSession(response.data.token, response.data.user);
+      setAuthLoading(false);
+    }).catch(error => {
+      removeUserSession();
+      setAuthLoading(false);
     });
-  };
+  }, []);
+
+  if (authLoading && getToken()) {
+    return <div className="content">Checking Authentication...</div>
+  }
 
   return (
-    <div>
-      <p>You must log in to vie the page at {from.pathname}</p>
-      <button onClick={login}>Log In</button>
-    </div>
-  )
+      <BrowserRouter>
+        <Header/>
+            <Switch>
+              <Route exact path="/" component={Home} />
+              <Route path="/products" component={Products} />
+              <Route path="/shopgrid" component={ShopGrid} />
+              <Route path="/cart" component={Cart} />
+              <Route path="/contact" component={Contact} />
+              <Route path="/service" component={Service} />
+              <PublicRoute path="/login" component={Login} />
+              <PrivateRoute path="/account" component={Account} />
+              <PrivateRoute path="/checkout" component={Checkout} />
+            </Switch>
+        <Footer/>
+      </BrowserRouter>
+  );
 }
+
+export default App;
