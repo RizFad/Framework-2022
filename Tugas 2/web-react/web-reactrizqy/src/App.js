@@ -1,17 +1,24 @@
 import React, { Component } from 'react';
+import {BrowserRouter, Route, Switch} from 'react-router-dom'
 import './App.css';
-import ClickCounter from './components/ClickCounter';
-import HoverCounter from './components/HoverCounter';
+import Index from './services/index';
+import BlogPost from './containers/BlogPost';
+import './BlogPost.css';
 
-class App extends Component{
-  render() {
-    return (
-      <div className='App'>
-          <ClickCounter />
-          <HoverCounter />
+
+function App() {
+  return(
+      <BrowserRouter>
+      <div>
+        <a href="#" className="back-to-top"><i className="fa fa-chevron-up"></i></a>
+        <div>
+        <Switch>
+            <Route exact path="/" component={BlogPost} />              
+        </Switch>    
+        </div>
       </div>
-    )
-  }
+      </BrowserRouter>
+  );
 }
 
 export default App;

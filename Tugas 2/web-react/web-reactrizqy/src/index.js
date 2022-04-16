@@ -7,9 +7,6 @@ import App from './App';
 // import registerServiceWorker from './registerServiceWorker';
 import reportWebVitals from './reportWebVitals';
 
-const store = compose(window.devToolsExtension ? window.devToolsExtension() : f => f)(createStore)(MainReducer)
-
-
 ReactDOM.render(
   <React.StrictMode>
     <App />
