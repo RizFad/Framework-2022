@@ -30,11 +30,9 @@ class BlogPost extends Component {
   }
 
   handleHapusArtikel = (data) => {
-    fetch(`http://localhost:3001/posts/${data}`, { method: "DELETE" }) // alamat URL API yang ingin kita HAPUS datanya
-      .then((res) => {
-        // ketika proses hapus berhasil, maka ambil data dari server API lokal
-        this.ambilDataDariSeverAPI();
-      });
+    API.deleteNewsBlog(data).then((result) => {
+      this.ambilDataDariServerAPI()
+    });
   };
 
   handleTambahArtikel = (event) => {
@@ -57,59 +55,90 @@ class BlogPost extends Component {
 
 
   render() {
+
     return (
-      <div className="post-artikel">
-        <div className="form pb-2 border-bottom">
-          <div className="form-gorup row">
-            <label htmlFor="title" className="col-sm-2 col-form-label">
-              Judul
-            </label>
-            <div className="col-sm-10">
-              <input
-                type="text"
-                className="form-control"
-                id="title"
-                name="title"
-                onChange={this.handleTambahArtikel}
-              />
+    
+        <section id="work" className="portfolio-mf sect-pt4 route">
+          <div className="container">
+            <div className="row">
+            <div className="col-sm-10" style={{marginLeft:80}} >
+              <div className="contact-mf">
+                <div id="contact" className="box-shadow-full">
+                  <div className="row">
+                    <div>
+                      <form className="contactForm">
+                        <div className="row">
+                          <div className="col-md-12 mb-3">
+                            <h5 className="title-left">Add Article</h5>
+                          </div>
+                          <div className="col-md-12 mb-3" style={{marginLeft:30}}>
+                            <div className="form-group">
+                              <input
+                                type="text"
+                                name="title"
+                                className="form-control"
+                                id="title"
+                                placeholder="Title"
+                                onChange={this.handleTambahArtikel}
+                              />
+                              <div className="validation" />
+                            </div>
+                          </div>
+                          <div className="col-md-12 mb-3" style={{marginLeft:30}}>
+                            <div className="form-group">
+                              <textarea
+                                className="form-control"
+                                name="body"
+                                rows={5}
+                                data-rule="required"
+                                placeholder="Body"
+                                onChange={this.handleTambahArtikel}
+                              />
+                              <div className="validation" />
+                            </div>
+                          </div>
+                          <div className="col-md-12">
+                            <p className="s-description text-right">
+                              <button
+                                className="button button-a button-big button-rouded"
+                                onClick={this.handleTombolSimpan}>
+                                Save
+                              </button>
+                            </p>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+              <div className="col-sm-12">
+                <div className="title-box text-center">
+                  <h3 className="title-a">List Article</h3>                  
+                  <div className="line-mf" />
+                </div>
+              </div>
+            </div>
+            <div className="row">
+              {/* post */}
+              {this.state.listArtikel.map((artikel) => {
+                //looping dan masukkan untuk setiap data yang ada di listartikel ke variabel artikel
+                return (
+                  <Post
+                    idArtikel={artikel.id}
+                    key={artikel.id}
+                    judul={artikel.title}
+                    isi={artikel.title}
+                    onDelete={(id) => this.handleHapusArtikel(id)}
+                  />
+                ); // mapping data json dari API sesuai dg kategori
+              })}
+              {/* end post */}
             </div>
           </div>
-          <div className="form-group row">
-            <label htmlFor="body" className="col-sm-2 col-form-label">
-              Isi
-            </label>
-            <div className="col-sm-10">
-              <textarea
-                name="body"
-                id="body"
-                rows="3"
-                className="form-control"
-                onChange={this.handleTambahArtikel}
-              ></textarea>
-            </div>
-          </div>
-          <button
-            type="submit"
-            className="btn btn-primary"
-            onClick={this.handleTombolSimpan}
-          >
-            Simpan
-          </button>
-        </div>
-        <h2>Daftar Artikel</h2>
-        {this.state.listArtikel.map((artikel) => {
-          // looping dan masukkan untuk setiap data yang ada di listArtikel ke variabel artikel
-          return (
-            <Post
-              key={artikel.id}
-              judul={artikel.title}
-              isi={artikel.body}
-              idArtikel={artikel.id}
-              hapusArtikel={this.handleHapusArtikel}
-            />
-          ); // mappingkan data json dari API sesuai dengan kategorinya
-        })}
-      </div>
+        </section>
+    
     );
   }
 }
